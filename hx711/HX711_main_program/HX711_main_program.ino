@@ -10,7 +10,7 @@ HX711 scale;
 //DIY_CHEAP_PERFECT
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.println("Load Cell Interfacing with ESP32 - DIY CHEAP PERFECT");
   
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
