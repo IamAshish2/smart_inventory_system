@@ -32,11 +32,12 @@
 // }
 
 // check the PIR sensor
-// #define PIR_PIN 21
+// #define PIR_PIN 13
 
 // void setup() {
 //   Serial.begin(115200);
 //   pinMode(PIR_PIN, INPUT);
+//   delay(30000);
 //   Serial.println("Testing PIR Sensor...");
 // }
 
@@ -57,8 +58,8 @@
 #include <ESP32Servo.h>
 
 // Define pins
-#define PIR_PIN 21       // GPIO connected to PIR sensor output
-#define SERVO_PIN 23     // GPIO connected to Servo motor signal
+#define PIR_PIN 13      // GPIO connected to PIR sensor output
+#define SERVO_PIN 21     // GPIO connected to Servo motor signal
 
 Servo servo;
 bool motionDetected = false;
@@ -75,7 +76,7 @@ void setup() {
 
   // Set servo to the initial position
   servo.write(0);  // Initial angle
-  delay(500);
+  delay(30000);
 
   Serial.println("System ready!");
 }
@@ -100,3 +101,4 @@ void loop() {
 
   delay(100); // Poll the PIR sensor every 100ms
 }
+

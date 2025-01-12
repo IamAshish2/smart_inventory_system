@@ -2,8 +2,8 @@
 
 #include "HX711.h"
 
-const int LOADCELL_DOUT_PIN = 2;
-const int LOADCELL_SCK_PIN = 4;
+const int LOADCELL_DOUT_PIN = 22;
+const int LOADCELL_SCK_PIN = 23;
 
 HX711 scale;
 
@@ -24,7 +24,7 @@ void setup() {
 void loop() {
   Serial.print("Weight: ");
   Serial.println(scale.get_units(10), 1);
-  scale.power_down();			        // put the ADC in sleep mode
+  scale.power_down();			        // put the ADC in sleep mode   
   delay(1000);
   scale.power_up();
 }

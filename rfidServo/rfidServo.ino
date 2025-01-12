@@ -90,7 +90,7 @@ RST - D25
  *  Made by miliohm.com
  */
 
-*/
+
 
 
 // 73 1F 27 2A
@@ -120,7 +120,7 @@ void setup() {
   Serial.println("Place an RFID card near the reader...");
 
   servo.attach(doorPin);
-  servo.write(180);
+  servo.write(0);
 }
 
 void loop() {
@@ -151,11 +151,11 @@ void loop() {
   if (content.substring(1) == "73 1F 27 2A") {
     Serial.println("Access Granted");
 
-    servo.write(0);
+    servo.write(300);
     Serial.println("door closing");
     delay(1000);
-    servo.write(180);
-    Serial.println("door closed");
+    servo.write(0);
+    // Serial.println("door closed");
   } else{
     Serial.println("Access Not Granted");
     Serial.println("Unauthorized");

@@ -1,33 +1,33 @@
-#include "HX711.h"
+// #include "HX711.h"
 
-// HX711 circuit wiring
-const int LOADCELL_DOUT_PIN = 22;
-const int LOADCELL_SCK_PIN = 23;
+// // HX711 circuit wiring
+// const int LOADCELL_DOUT_PIN = 22;
+// const int LOADCELL_SCK_PIN = 23;
 
-HX711 scale;
+// HX711 scale;
 
-//DIY_CHEAP_PERFECT
+// //DIY_CHEAP_PERFECT
 
-void setup() {
-  Serial.begin(115200);
-  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-  scale.tare();                // reset the scale to 0
-}
+// void setup() {
+//   Serial.begin(115200);
+//   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
+//   scale.tare();                // reset the scale to 0
+// }
 
 
-void loop() {
+// void loop() {
 
-  if (scale.is_ready()) {
-    Serial.print("HX711 reading: ");
-    Serial.println(scale.get_value(5)); // print the average of 5 readings from the ADC minus the tare weight, set with tare()
-  } 
-  else if(!scale.is_ready()) {
-    Serial.println("HX711 not found.");
-  }
+//   if (scale.is_ready()) {
+//     Serial.print("HX711 reading: ");
+//     Serial.println(scale.get_value(5)); // print the average of 5 readings from the ADC minus the tare weight, set with tare()
+//   } 
+//   else if(!scale.is_ready()) {
+//     Serial.println("HX711 not found.");
+//   }
 
-  delay(500);
+//   delay(500);
   
-}
+// }
 
 
 // #include "HX711.h"
@@ -74,4 +74,61 @@ void loop() {
 
 //   delay(500);
 // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include "HX711.h"
+
+// Define HX711 pins
+#define DT 23   // Data pin
+#define SCK 22  // Clock pin
+
+HX711 scale;
+
+void setup() {
+  Serial.begin(115200);
+
+  // Initialize the scale
+  scale.begin(DT, SCK);
+
+  // Calibrate the scale (replace with your calibration factor)
+  Serial.println("Calibrating scale...");
+  // scale.set_scale(2280.f); // Adjust this value to calibrate the scale
+  scale.tare();            // Reset the scale to 0
+  Serial.println("Scale initialized!");
+}
+
+void loop() {
+  if (scale.is_ready()) {
+    // Read the weight in grams
+    float weight = scale.get_units();
+    Serial.print("Weight: ");
+    Serial.print(weight, 2); // Print weight with 2 decimal points
+    Serial.println(" g");
+  } else {
+    Serial.println("Scale not ready");
+  }
+
+  delay(1000); // Wait 1 second between readings
+}
+
 
