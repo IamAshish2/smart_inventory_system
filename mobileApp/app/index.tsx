@@ -1,18 +1,10 @@
-// Fix for the QuickStatCard component - removed TypeScript optional parameter syntax
-const QuickStatCard = ({ title, value, subtitle, color }) => (
-  <View style={[styles.quickStatCard, { borderLeftColor: color }]}>
-    <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={styles.cardValue}>{value}</Text>
-    {subtitle && <Text style={styles.cardSubtitle}>{subtitle}</Text>}
-  </View>
-);
-
-// The rest of the code remains the same as it was already correct, but here's the full working version
+import QuickStatCard from '@/components/custom/QuickStatCard';
+import InfoCard from '@/components/custom/InfoCard';
 import { db } from '@/lib/firebase/firebase';
-import { StatusBar } from 'expo-status-bar';
 import { onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, SafeAreaView, } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { renderDoorInfoProps } from '@/lib/types';
 
 const IoTDashboard = () => {
   const [activeTab, setActiveTab] = useState('inventory');
@@ -35,13 +27,34 @@ const IoTDashboard = () => {
     }
   });
 
+  // Check for zero items and show notifications
+  useEffect(() => {
+    const inventoryCount = Math.floor((data.Inventory?.stock) / 74) || 0;
+    const storeCount = Math.floor((data.Store?.products) / 74) || 0;
+
+    if (inventoryCount === 0) {
+      Alert.alert(
+        "",
+        "The inventory count has reached 0 items!",
+        [{ text: "OK" }]
+      );
+    }
+
+    if (storeCount === 0) {
+      Alert.alert(
+        "",
+        "The store products count has reached 0 items!",
+        [{ text: "OK" }]
+      );
+    }
+  }, [data.Inventory?.stock, data.Store?.products]);
+
   useEffect(() => {
     const dbRef = ref(db, '/');
     return onValue(dbRef, (snapshot) => {
       try {
         const newData = snapshot.val();
         console.log(newData);
-
         setData(newData);
       } catch (error) {
         console.log('Error fetching data:', error);
@@ -49,33 +62,12 @@ const IoTDashboard = () => {
     });
   }, []);
 
-  const getDoorStatus = (door) => {
+  const getDoorStatus = (door: any) => {
     if (!door) return "Unknown";
     const lastOpenedTime = new Date(door.opened_at);
     const lastClosedTime = new Date(door.closed_at);
     return lastOpenedTime > lastClosedTime ? "Open" : "Closed";
   };
-
-  const formatTime = (timestamp) => {
-    if (!timestamp || timestamp.includes("1970")) return "Not available";
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const InfoCard = ({ title, items }) => (
-    <View style={styles.infoCard}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {items.map((item, index) => (
-        <View key={index} style={styles.infoRow}>
-          <Text style={styles.infoLabel}>{item.label}</Text>
-          <Text style={styles.infoValue}>{item.value}</Text>
-        </View>
-      ))}
-    </View>
-  );
 
   const renderDoorInfo = (doorData, title) => (
     <InfoCard
@@ -105,7 +97,7 @@ const IoTDashboard = () => {
             <InfoCard
               title="Inventory Status"
               items={[
-                { label: "Current Stock", value: data.Inventory?.stock || 0 }
+                { label: "Current Stock", value: Math.floor((data.Inventory?.stock) / 70) || 0 }
               ]}
             />
             {renderDoorInfo(data.Inventory?.door, "Inventory")}
@@ -118,7 +110,7 @@ const IoTDashboard = () => {
           <InfoCard
             title="Store Status"
             items={[
-              { label: "Products", value: data.Store?.products || 0 }
+              { label: "Products", value: Math.floor((data.Store?.products) / 70) || 0 }
             ]}
           />
         );
@@ -133,7 +125,7 @@ const IoTDashboard = () => {
         <View style={styles.quickStats}>
           <QuickStatCard
             title="Inventory Stock"
-            value={`${data.Inventory?.stock || 0} items`}
+            value={`${Math.floor((data.Inventory?.stock) / 70) || 0} items in stock `}
             subtitle={''}
             color="#2196F3"
           />
@@ -151,7 +143,7 @@ const IoTDashboard = () => {
           />
           <QuickStatCard
             title="Store Products"
-            value={data.Store?.products || 0}
+            value={`${Math.floor((data.Store?.products) / 70) || 0} item in the store`}
             subtitle={''}
             color="#9C27B0"
           />
@@ -182,43 +174,12 @@ const IoTDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 20,
+    marginTop: 40,
     backgroundColor: '#f5f5f5',
   },
   quickStats: {
     padding: 16,
     gap: 12,
-  },
-  quickStatCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
-    borderLeftWidth: 4,
-    marginBottom: 0,
-  },
-  cardTitle: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  cardValue: {
-    fontSize: 28,
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#222',
-  },
-  cardSubtitle: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -249,43 +210,7 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     padding: 16,
-  },
-  infoCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  infoLabel: {
-    fontSize: 14,
-    color: '#666',
-    flex: 1,
-  },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#222',
-    marginLeft: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 16,
-    color: '#222',
-    paddingHorizontal: 4,
-  },
-  storeMetrics: {
-    gap: 16,
-  },
+  }
 });
 
 export default IoTDashboard;
